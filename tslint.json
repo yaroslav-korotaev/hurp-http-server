@@ -1,0 +1,6 @@
+{
+  "extends": "tslint-config-hurp",
+  "rules": {
+    "no-unused-variable": false
+  }
+}

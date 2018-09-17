@@ -22,9 +22,15 @@
     },
     "sourceMap": true,
     "strict": true,
-    "target": "es2017"
+    "target": "es2017",
+    "types": [
+      "node"
+    ]
   },
   "include": [
     "src/**/*.ts"
+  ],
+  "exclude": [
+    "**/__tests__/**"
   ]
 }

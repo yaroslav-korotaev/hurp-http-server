@@ -1,3 +1,8 @@
 /node_modules
+<<<<<<< HEAD
 /debug
 /lib
+=======
+/lib
+/coverage
+>>>>>>> template/master

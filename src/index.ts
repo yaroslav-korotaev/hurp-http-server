@@ -1,30 +1,65 @@
 import * as net from 'net';
 import * as http from 'http';
+import { Log } from 'hurp-types';
 
-export interface Log {
-  info(...args: any[]): any;
-  child(...args: any[]): Log;
+interface Connection {
+  socket: net.Socket;
+  idle: boolean;
 }
 
 export interface Options {
   tag?: string;
   log: Log;
-  server: http.Server;
+  server?: http.Server;
+  handler: (req: http.IncomingMessage, res: http.ServerResponse) => void;
   listen?: net.ListenOptions;
 }
 
 export default class HttpServer {
+  private destroyed: boolean;
+  private readonly connections: Map<net.Socket, Connection>;
+  
   public readonly tag: string;
   public readonly log: Log;
   public readonly server: http.Server;
   public readonly listenOptions?: net.ListenOptions;
   
   constructor(options: Options) {
+    this.destroyed = false;
+    this.connections = new Map();
+    
     this.tag = options.tag || 'http-server';
     this.log = options.log.child({ tag: this.tag });
     
-    this.server = options.server;
+    const server = options.server || http.createServer();
+    server.on('request', options.handler);
+    this.server = server;
+    
     this.listenOptions = options.listen;
+  }
+  
+  private trackConnection(socket: net.Socket): void {
+    const conn = { socket, idle: true };
+    this.connections.set(socket, conn);
+    
+    socket.on('close', () => {
+      this.connections.delete(socket);
+    });
+  }
+  
+  private trackRequest(req: http.IncomingMessage, res: http.ServerResponse): void {
+    const conn = this.connections.get(req.socket) as Connection;
+    conn.idle = false;
+    
+    res.on('finish', () => {
+      conn.idle = true;
+      this.destroyConnection(conn);
+    });
+  }
+  
+  private destroyConnection(conn: Connection): void {
+    if (this.destroyed && conn.idle)
+      conn.socket.destroy();
   }
   
   public async init(): Promise<void> {
@@ -35,7 +70,11 @@ export default class HttpServer {
       server.listen(this.listenOptions, () => {
         server.removeListener('error', reject);
         
+        server.on('connection', socket => this.trackConnection(socket));
+        server.on('request', (req, res) => this.trackRequest(req, res));
+        
         const address = server.address();
+        /* istanbul ignore next */
         const listening = (typeof address == 'object')
           ? { host: address.address, port: address.port }
           : { path: address }
@@ -51,6 +90,10 @@ export default class HttpServer {
     await new Promise<void>(resolve => {
       this.server.once('close', resolve);
       this.server.close();
+      
+      this.destroyed = true;
+      for (let conn of this.connections.values())
+        this.destroyConnection(conn);
     });
     
     this.log.info('closed');

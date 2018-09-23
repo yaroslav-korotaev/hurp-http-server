@@ -24,10 +24,14 @@
     "build": "tsc",
     "test": "jest"
   },
-  "dependencies": {},
+  "dependencies": {
+    "hurp-types": "^1.0.0"
+  },
   "devDependencies": {
+    "@types/got": "^8.3.3",
     "@types/jest": "^23.3.2",
     "@types/node": "^10.9.4",
+    "got": "^9.2.2",
     "jest": "^23.6.0",
     "jest-extended": "^0.8.1",
     "npm-run-all": "^4.1.3",

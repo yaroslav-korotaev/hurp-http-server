@@ -71,7 +71,9 @@ export default class HttpServer {
         server.removeListener('error', reject);
         
         server.on('connection', socket => this.trackConnection(socket));
-        server.on('request', (req, res) => this.trackRequest(req, res));
+        server.on('request', (req: http.IncomingMessage, res: http.ServerResponse) => {
+          this.trackRequest(req, res);
+        });
         
         const address = server.address();
         /* istanbul ignore next */
@@ -92,7 +94,7 @@ export default class HttpServer {
       this.server.close();
       
       this.destroyed = true;
-      for (let conn of this.connections.values())
+      for (const conn of this.connections.values())
         this.destroyConnection(conn);
     });
     

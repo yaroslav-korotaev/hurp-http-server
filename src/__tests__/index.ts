@@ -1,5 +1,9 @@
 import * as net from 'net';
 import * as http from 'http';
+// Importing 'jest-extended' explicitly for VS Code IntelliSense support until the better solution
+// is found
+// tslint:disable-next-line:no-import-side-effect
+import 'jest-extended';
 import HttpServer from '../index';
 import got from 'got';
 
@@ -20,7 +24,7 @@ function createLog() {
 function createServer(port: number = 0, hook: () => void = () => {}) {
   const server = new HttpServer({
     log: createLog(),
-    handler: (req, res) => {
+    handler: (req, res): void => {
       if (hook)
         hook();
       
@@ -28,7 +32,7 @@ function createServer(port: number = 0, hook: () => void = () => {}) {
         return res.end('foo');
       
       if (req.url == '/delay')
-        return setTimeout(() => res.end('delay'), 200);
+        return void setTimeout(() => res.end('delay'), 200);
       
       res.statusCode = 404;
       res.end();
@@ -61,10 +65,6 @@ async function request(
   const response = await got(`http://localhost:${port}${path}`, { agent });
   
   return response.body;
-};
-
-async function delay(ms) {
-  await new Promise(resolve => setTimeout(resolve, ms));
 }
 
 describe('HttpServer', () => {
@@ -102,14 +102,14 @@ describe('HttpServer', () => {
   test('waiting for pending and terminating keep alived andconnections', async () => {
     let hook;
     
-    const connected = new Promise(resolve => hook = resolve);
+    const connected = new Promise<void>(resolve => hook = resolve);
     const server = createServer(0, hook);
     await server.init();
     
-    let result = { err: null, res: null };
-    let promise = request(server, '/delay', true)
-      .then(res => result.res = res)
-      .catch(err => result.err = err)
+    const result: { err?: Error; res?: string } = { err: undefined, res: undefined };
+    const promise = request(server, '/delay', true)
+      .then((res: string) => result.res = res)
+      .catch((err: Error) => result.err = err)
     ;
     
     await connected;
@@ -117,7 +117,7 @@ describe('HttpServer', () => {
     await promise;
     
     expect(server.server.listening).toBe(false);
-    expect(result.err).toBe(null);
+    expect(result.err).toBe(undefined);
     expect(result.res).toBe('delay');
   }, 1000);
 });

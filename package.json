@@ -1,6 +1,6 @@
 {
   "name": "hurp-http-server",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Hurp module wrapper for Node.js http[s].Server",
   "keywords": [
     "hurp",

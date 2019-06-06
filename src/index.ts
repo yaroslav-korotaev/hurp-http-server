@@ -76,12 +76,8 @@ export default class HttpServer {
         });
         
         const address = server.address();
-        /* istanbul ignore next */
-        const listening = (typeof address == 'object')
-          ? { host: address.address, port: address.port }
-          : { path: address }
-        ;
-        this.log.info(listening, 'listening');
+        
+        this.log.info({ address }, 'listening');
         
         resolve();
       });

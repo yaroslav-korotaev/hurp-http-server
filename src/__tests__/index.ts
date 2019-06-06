@@ -1,9 +1,5 @@
 import * as net from 'net';
 import * as http from 'http';
-// Importing 'jest-extended' explicitly for VS Code IntelliSense support until the better solution
-// is found
-// tslint:disable-next-line:no-import-side-effect
-import 'jest-extended';
 import HttpServer from '../index';
 import got from 'got';
 

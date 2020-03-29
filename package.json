@@ -17,10 +17,6 @@
   "types": "./dist/index.d.ts",
   "repository": "yaroslav-korotaev/hurp-http-server",
   "scripts": {
-    "lint:src": "tslint -c tslint.json -p tsconfig.json -t stylish",
-    "prelint:test": "tsc -p tsconfig.test.json",
-    "lint:test": "tslint -c tslint.test.json -p tsconfig.test.json -t stylish",
-    "lint": "run-s lint:src lint:test",
     "build": "tsc",
     "test": "jest -c jest.config.json"
   },
@@ -28,15 +24,12 @@
     "hurp-types": "^1.0.3"
   },
   "devDependencies": {
-    "@types/got": "^9.4.4",
-    "@types/jest": "^24.0.13",
-    "@types/node": "^12.0.6",
-    "got": "^9.6.0",
-    "jest": "^24.8.0",
-    "npm-run-all": "^4.1.5",
-    "ts-jest": "^24.0.2",
-    "tslint": "^5.17.0",
-    "tslint-config-hurp": "^1.2.2",
-    "typescript": "^3.5.1"
+    "@types/got": "^9.6.9",
+    "@types/jest": "^25.1.4",
+    "@types/node": "^13.9.5",
+    "got": "^10.7.0",
+    "jest": "^25.2.3",
+    "ts-jest": "^25.2.1",
+    "typescript": "^3.8.3"
   }
 }
